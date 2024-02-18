@@ -132,18 +132,26 @@ public class EmployeeController {
 	@PostMapping("/update/{code}/")
 	public String postEmpoyee(@Validated Employee employee,BindingResult res, Model model) {
 
-		if(res.hasErrors()) {
+
+
+       if(res.hasErrors()) {
 			return getEmployee(null,model,employee);
 		}
-		employeeService.update(employee);
 
+
+
+try {
 		ErrorKinds result = employeeService.update(employee);
 		if (ErrorMessage.contains(result)) {
                 model.addAttribute(ErrorMessage.getErrorName(result), ErrorMessage.getErrorValue(result));
-                return create(employee);
+                return getEmployee(null,model,employee);
             }
 
-		return "redirect:/employees";
+        } catch (DataIntegrityViolationException e) {
+          model.addAttribute(ErrorMessage.getErrorName(ErrorKinds.DUPLICATE_EXCEPTION_ERROR),
+          ErrorMessage.getErrorValue(ErrorKinds.DUPLICATE_EXCEPTION_ERROR));
+        }
+          return "redirect:/employees";
 	}
      //～追加
-}
+	}

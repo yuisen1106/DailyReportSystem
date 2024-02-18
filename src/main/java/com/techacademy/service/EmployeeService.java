@@ -114,6 +114,8 @@ public class EmployeeService {
     // 従業員パスワードの8文字～16文字チェック処理
     public boolean isOutOfRangePassword(Employee employee) {
 
+
+
         // 桁数チェック
         int passwordLength = employee.getPassword().length();
         return passwordLength < 8 || 16 < passwordLength;
@@ -124,11 +126,20 @@ public class EmployeeService {
     @Transactional
     public ErrorKinds update(Employee employee) {
 
-ErrorKinds result = employeePasswordCheck(employee);
+       /* if (!"".equals(employee.getPassword())) {
+
+    	ErrorKinds result = employeePasswordCheck(employee);
         if (ErrorKinds.CHECK_OK != result) {
             return result;
         }
+        }*/
 
+    	if (!"".equals(employee.getPassword())) {
+        ErrorKinds result = employeePasswordCheck(employee);
+        if (ErrorKinds.CHECK_OK != result) {
+            return result;
+        }
+    }
 
 
          employee.setDeleteFlg(false);
