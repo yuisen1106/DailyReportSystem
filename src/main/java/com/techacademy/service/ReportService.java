@@ -12,22 +12,27 @@ import org.springframework.stereotype.Service;
 
 import com.techacademy.constants.ErrorKinds;
 import com.techacademy.entity.Employee;
+import com.techacademy.entity.Report;
 import com.techacademy.repository.EmployeeRepository;
+import com.techacademy.repository.ReportRepository;
+
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class EmployeeService {
+public class ReportService {
 
-    private final EmployeeRepository employeeRepository;
+    private final ReportRepository reportRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmployeeService employeeService;
 
     @Autowired
-    public EmployeeService(EmployeeRepository employeeRepository, PasswordEncoder passwordEncoder) {
-        this.employeeRepository = employeeRepository;
+    public ReportService(ReportRepository reportRepository, PasswordEncoder passwordEncoder,EmployeeService employeeService) {
+        this.reportRepository = reportRepository;
         this.passwordEncoder = passwordEncoder;
+         this.employeeService = employeeService;
     }
 
-    // 従業員保存
+ /*   // 従業員保存
     @Transactional
     public ErrorKinds save(Employee employee) {
 
@@ -67,21 +72,34 @@ public class EmployeeService {
 
         return ErrorKinds.SUCCESS;
     }
+*/
+    // 従業員一覧表示処理
+    public List<Report> findAll() {
+
+        return reportRepository.findAll();
+
+    }
+
+
+     //追記！！！！
 
     // 従業員一覧表示処理
-    public List<Employee> findAll() {
-        return employeeRepository.findAll();
+    public List<Report> findAll(String code) {
+
+
+    	return reportRepository.findByEmployeeCode(code);
     }
+
 
     // 1件を検索
-    public Employee findByCode(String code) {
+    public Report findById(Integer id) {
         // findByIdで検索
-        Optional<Employee> option = employeeRepository.findById(code);
+        Optional<Report> option = reportRepository.findById(id);
         // 取得できなかった場合はnullを返す
-        Employee employee = option.orElse(null);
-        return employee;
+        Report report = option.orElse(null);
+        return report;
     }
-
+/*
     // 従業員パスワードチェック
     private ErrorKinds employeePasswordCheck(Employee employee) {
 
@@ -144,7 +162,14 @@ public class EmployeeService {
 
         employeeRepository.save(employee);
         return ErrorKinds.SUCCESS;
-    }
+    }*/
 
+
+    public String employeeName(String code) {
+
+       Employee employee= employeeService.findByCode(code);
+       String name =employee.getName();
+        return name;
+    }
 }
 

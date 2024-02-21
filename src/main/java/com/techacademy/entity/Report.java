@@ -1,7 +1,10 @@
 package com.techacademy.entity;
 
 import java.sql.Date;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+
+import org.springframework.format.annotation.DateTimeFormat;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -12,6 +15,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
@@ -25,8 +29,10 @@ public class Report {
 	private Integer id;
 
 	/**日付*/
+	@NotNull
 	@Column(nullable = false)
-	private Date report_date;
+	@DateTimeFormat(pattern="yyyy-MM-dd")
+	private LocalDate reportDate;
 
 	/**タイトル*/
 	@Column(length=100,nullable = false)
@@ -43,15 +49,15 @@ public class Report {
 
 	 /**削除フラグ*/
     @Column(columnDefinition="TINYINT", nullable = false)
-    private boolean delete_flg;
+    private boolean deleteFlg;
 
      /** 登録日時*/
     @Column(nullable = false)
-    private LocalDateTime created_at;
+    private LocalDateTime createdAt;
 
     /**更新日時*/
     @Column(nullable = false)
-    private LocalDateTime updated_at;
+    private LocalDateTime updatedAt;
 
 }
 
