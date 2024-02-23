@@ -9,7 +9,7 @@ import com.techacademy.entity.Report;
 
 public interface ReportRepository extends JpaRepository<Report, Integer> {
 
-//!!追記
+//追記
 List<Report> findByEmployeeCode(String employeecode);
 
 }
