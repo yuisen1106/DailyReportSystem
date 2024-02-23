@@ -69,8 +69,10 @@ public class reportController {
     @GetMapping("/add")
     public String create(@ModelAttribute Report report,@AuthenticationPrincipal UserDetail userDetail,Model model) {
 
-    	String employeeCode = userDetail.getUsername();
-        model.addAttribute("username", reportService.employeeName(employeeCode));
+    	List<Report>reports = reportService.findAll(userDetail.getUsername());
+    	String username = reports.get(0).getEmployee().getName();
+
+        model.addAttribute("username", username);
 
         return "reports/new";
     }
@@ -108,9 +110,9 @@ public class reportController {
 
     // 日報削除処理
     @PostMapping(value = "/{id}/delete")
-    public String delete(@PathVariable Integer id, @AuthenticationPrincipal UserDetail userDetail, Model model) {
+    public String delete(@PathVariable Integer id,Model model) {
 
-         reportService.delete(id, userDetail);
+         reportService.delete(id);
 
 
 

@@ -24,30 +24,19 @@ import org.springframework.transaction.annotation.Transactional;
 public class ReportService {
 
     private final ReportRepository reportRepository;
-   // private final PasswordEncoder passwordEncoder;
-    private final EmployeeService employeeService;
+
+
 
     @Autowired
-    public ReportService(ReportRepository reportRepository, PasswordEncoder passwordEncoder,EmployeeService employeeService) {
+    public ReportService(ReportRepository reportRepository, PasswordEncoder passwordEncoder) {
         this.reportRepository = reportRepository;
-    //    this.passwordEncoder = passwordEncoder;
-         this.employeeService = employeeService;
     }
 
   // 日報保存
     @Transactional
     public Report save(Report report,@AuthenticationPrincipal UserDetail userDetail) {
 
-       /* // パスワードチェック
-        ErrorKinds result = employeePasswordCheck(employee);
-        if (ErrorKinds.CHECK_OK != result) {
-            return result;
-        }
 
-        // 従業員番号重複チェック
-        if (findByCode(employee.getCode()) != null) {
-            return ErrorKinds.DUPLICATE_ERROR;
-        }*/
 
         report.setDeleteFlg(false);
 
@@ -55,17 +44,17 @@ public class ReportService {
         report.setCreatedAt(now);
         report.setUpdatedAt(now);
 
-        Employee employee = employeeService.findByCode(userDetail.getUsername());
-        report.setEmployee(employee);
-
-
+       // Employee employee = employeeService.findByCode(userDetail.getUsername());
+       // report.setEmployee(employee);
+         List <Report> reports=findAll(userDetail.getUsername());
+         report.setEmployee(reports.get(0).getEmployee());
         return  reportRepository.save(report);
 
     }
 
      //日報削除
     @Transactional
-    public void delete(Integer id, UserDetail userDetail) {
+    public void delete(Integer id) {
 
 
         Report report = findById(id);
@@ -175,12 +164,12 @@ public class ReportService {
     }
 
 
-    //名前
+    /*//名前
     public String employeeName(String code) {
 
        Employee employee= employeeService.findByCode(code);
        String name =employee.getName();
         return name;
-    }
+    }*/
 }
 
