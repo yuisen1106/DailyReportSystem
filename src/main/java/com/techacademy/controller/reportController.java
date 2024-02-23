@@ -1,5 +1,8 @@
 package com.techacademy.controller;
 
+import java.time.LocalDate;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -39,7 +42,7 @@ public class reportController {
     public String list(Model model,@AuthenticationPrincipal UserDetail userDetail) {
 
     	String code = userDetail.getUsername();
-    	System.out.println(code);
+
     	if("1".equals(code)) {
         model.addAttribute("listSize", reportService.findAll().size());
         model.addAttribute("reportList", reportService.findAll());
@@ -59,7 +62,7 @@ public class reportController {
         return "reports/detail";
     }
 
-    // 従業員新規登録画面
+    // 日報新規登録画面
     @GetMapping("/add")
     public String create(@ModelAttribute Report report,@AuthenticationPrincipal UserDetail userDetail,Model model) {
 
@@ -69,65 +72,50 @@ public class reportController {
         return "reports/new";
     }
 
-   /* // 従業員新規登録処理
+    // 日報新規登録処理
     @PostMapping(value = "/add")
-    public String add(@Validated Employee employee, BindingResult res, Model model) {
+    public String add(@Validated Report report, BindingResult res,@AuthenticationPrincipal UserDetail userDetail, Model model) {
 
-        // パスワード空白チェック
-        /*
-         * エンティティ側の入力チェックでも実装は行えるが、更新の方でパスワードが空白でもチェックエラーを出さずに
-         * 更新出来る仕様となっているため上記を考慮した場合に別でエラーメッセージを出す方法が簡単だと判断
-         */
-     /*   if ("".equals(employee.getPassword())) {
-            // パスワードが空白だった場合
-            model.addAttribute(ErrorMessage.getErrorName(ErrorKinds.BLANK_ERROR),
-                    ErrorMessage.getErrorValue(ErrorKinds.BLANK_ERROR));
 
-            return create(employee);
-
-        }
 
         // 入力チェック
         if (res.hasErrors()) {
-            return create(employee);
+            return create(report,userDetail,model);
         }
 
-        // 論理削除を行った従業員番号を指定すると例外となるためtry~catchで対応
-        // (findByIdでは削除フラグがTRUEのデータが取得出来ないため)
-        try {
-            ErrorKinds result = employeeService.save(employee);
+        //追加日付の重複について
 
-            if (ErrorMessage.contains(result)) {
-                model.addAttribute(ErrorMessage.getErrorName(result), ErrorMessage.getErrorValue(result));
-                return create(employee);
-            }
+         LocalDate newReportDate = report.getReportDate();
+         String code = userDetail.getUsername();
+         List<Report> reportlist = reportService.findAll(code);
+          for(Report exitReport : reportlist) {
+          if(exitReport.getReportDate().equals(newReportDate)) {
+            model.addAttribute("DateError", "既に登録されている日付です");
 
-        } catch (DataIntegrityViolationException e) {
-            model.addAttribute(ErrorMessage.getErrorName(ErrorKinds.DUPLICATE_EXCEPTION_ERROR),
-                    ErrorMessage.getErrorValue(ErrorKinds.DUPLICATE_EXCEPTION_ERROR));
-            return create(employee);
-        }
+           return create(report,userDetail,model);
+        	  }
+          }
 
-        return "redirect:/employees";
-    }
 
-    // 従業員削除処理
-    @PostMapping(value = "/{code}/delete")
-    public String delete(@PathVariable String code, @AuthenticationPrincipal UserDetail userDetail, Model model) {
+           reportService.save(report,userDetail);
 
-        ErrorKinds result = employeeService.delete(code, userDetail);
-
-        if (ErrorMessage.contains(result)) {
-            model.addAttribute(ErrorMessage.getErrorName(result), ErrorMessage.getErrorValue(result));
-            model.addAttribute("employee", employeeService.findByCode(code));
-            return detail(code, model);
-        }
-
-        return "redirect:/employees";
+           return "redirect:/reports/list";
     }
 
 
-    */
+    // 日報削除処理
+    @PostMapping(value = "/{id}/delete")
+    public String delete(@PathVariable Integer id, @AuthenticationPrincipal UserDetail userDetail, Model model) {
+
+         reportService.delete(id, userDetail);
+
+
+
+        return "redirect:/reports/list";
+    }
+
+
+
     //更新画面
     @GetMapping("/{id}/update")
     public String getReport(@PathVariable("id") Integer id,Model model,Report report) {
@@ -144,23 +132,23 @@ public class reportController {
 
     /**更新処理*/
 
-/*	@PostMapping("/update/{code}/")
-	public String postEmpoyee(@Validated Employee employee,BindingResult res, Model model) {
+	@PostMapping("/update/{id}")
+	public String postReport(@Validated Report report,BindingResult res, Model model,@AuthenticationPrincipal UserDetail userDetail) {
 
 		if(res.hasErrors()) {
-			return getEmployee(null,model,employee);
+			return getReport(null,model,report);
 		}
-		employeeService.update(employee);
+		reportService.save(report,userDetail);
 
-		ErrorKinds result = employeeService.update(employee);
+		/*ErrorKinds result = employeeService.update(employee);
 		if (ErrorMessage.contains(result)) {
                 model.addAttribute(ErrorMessage.getErrorName(result), ErrorMessage.getErrorValue(result));
-                return create(employee);
-            }
+                return create(employee);*/
 
-		return "redirect:/employees";
+
+		return "redirect:/reports/list";
 	}
      //～追加
 
-	*/
+
 }

@@ -2,6 +2,7 @@
 package com.techacademy.entity;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.validator.constraints.Length;
@@ -12,6 +13,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.PreRemove;
 import jakarta.persistence.Table;
@@ -73,16 +75,17 @@ public class Employee {
     private LocalDateTime updatedAt;
 
 
-    @OneToOne(mappedBy ="employee")
-    private Report report;
+    @OneToMany(mappedBy ="employee")
+    private List<Report> report;
 
     @PreRemove
 	@Transactional
 	private void preRemove() {
 		if(report != null) {
+			for (Report report : report) {
 			report.setEmployee(null);
 		}
 
 }
-
+    }
 }

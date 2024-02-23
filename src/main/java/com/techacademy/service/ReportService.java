@@ -7,6 +7,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -22,21 +23,21 @@ import org.springframework.transaction.annotation.Transactional;
 public class ReportService {
 
     private final ReportRepository reportRepository;
-    private final PasswordEncoder passwordEncoder;
+   // private final PasswordEncoder passwordEncoder;
     private final EmployeeService employeeService;
 
     @Autowired
     public ReportService(ReportRepository reportRepository, PasswordEncoder passwordEncoder,EmployeeService employeeService) {
         this.reportRepository = reportRepository;
-        this.passwordEncoder = passwordEncoder;
+    //    this.passwordEncoder = passwordEncoder;
          this.employeeService = employeeService;
     }
 
- /*   // 従業員保存
+  // 日報保存
     @Transactional
-    public ErrorKinds save(Employee employee) {
+    public Report save(Report report,@AuthenticationPrincipal UserDetail userDetail) {
 
-        // パスワードチェック
+       /* // パスワードチェック
         ErrorKinds result = employeePasswordCheck(employee);
         if (ErrorKinds.CHECK_OK != result) {
             return result;
@@ -45,35 +46,36 @@ public class ReportService {
         // 従業員番号重複チェック
         if (findByCode(employee.getCode()) != null) {
             return ErrorKinds.DUPLICATE_ERROR;
-        }
+        }*/
 
-        employee.setDeleteFlg(false);
+        report.setDeleteFlg(false);
 
         LocalDateTime now = LocalDateTime.now();
-        employee.setCreatedAt(now);
-        employee.setUpdatedAt(now);
+        report.setCreatedAt(now);
+        report.setUpdatedAt(now);
 
-        employeeRepository.save(employee);
-        return ErrorKinds.SUCCESS;
+        Employee employee = employeeService.findByCode(userDetail.getUsername());
+        report.setEmployee(employee);
+
+
+        return  reportRepository.save(report);
+
     }
 
-    // 従業員削除
+     //日報削除
     @Transactional
-    public ErrorKinds delete(String code, UserDetail userDetail) {
+    public void delete(Integer id, UserDetail userDetail) {
 
-        // 自分を削除しようとした場合はエラーメッセージを表示
-        if (code.equals(userDetail.getEmployee().getCode())) {
-            return ErrorKinds.LOGINCHECK_ERROR;
-        }
-        Employee employee = findByCode(code);
+
+        Report report = findById(id);
         LocalDateTime now = LocalDateTime.now();
-        employee.setUpdatedAt(now);
-        employee.setDeleteFlg(true);
+        report.setUpdatedAt(now);
+        report.setDeleteFlg(true);
 
-        return ErrorKinds.SUCCESS;
+
     }
-*/
-    // 従業員一覧表示処理
+
+    // 日報一覧表示処理
     public List<Report> findAll() {
 
         return reportRepository.findAll();
