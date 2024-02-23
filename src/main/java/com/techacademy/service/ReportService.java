@@ -1,5 +1,6 @@
 package com.techacademy.service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -144,8 +145,20 @@ public class ReportService {
     //日報　更新
 
     @Transactional
-    public Report update(Report report,Integer id) {
+    public ErrorKinds update(Report report,Integer id) {
 
+    	/**/Report registeredreport=findById(id);
+
+    	//日付の重複について
+    	LocalDate newReportDate = report.getReportDate();
+         String code = registeredreport.getEmployee().getCode();
+         List<Report> reportlist = findAll(code);
+         for(Report exitReport : reportlist) {
+         if(exitReport.getReportDate().equals(newReportDate)) {
+    	 return ErrorKinds.DATECHECK_ERROR;
+
+         }
+         }
 
         report.setDeleteFlg(false);
 
@@ -153,12 +166,12 @@ public class ReportService {
         report.setCreatedAt(now);
         report.setUpdatedAt(now);
 
-        Report registeredreport=findById(id);
+        //
         report.setEmployee(registeredreport.getEmployee());
 
 
-        return  reportRepository.save(report);
-
+        reportRepository.save(report);
+        return ErrorKinds.SUCCESS;
     }
 
 

@@ -43,6 +43,7 @@ public class Report {
 	/**タイトル*/
 	@NotEmpty
 	@Column(length=100,nullable = false)
+	@Length(max = 100)
 	private String title;
 
 	/**内容*/

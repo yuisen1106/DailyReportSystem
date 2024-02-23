@@ -58,7 +58,10 @@ public class reportController {
     public String detail(@PathVariable("id") Integer id, Model model) {
 
 
-       model.addAttribute("report", reportService.findById(id));
+       model.addAttribute("report",reportService.findById(id));
+
+
+
         return "reports/detail";
     }
 
@@ -118,12 +121,15 @@ public class reportController {
 
     //更新画面
     @GetMapping("/{id}/update")
-    public String getReport(@PathVariable("id") Integer id,Model model,Report report) {
+    public String edit(@PathVariable("id") Integer id,Model model,Report report) {
 
     if(id != null) {
     model.addAttribute("report" , reportService.findById(id));
+    model.addAttribute("employeeName", reportService.findById(id).getEmployee().getName());
     }else {
-	model.addAttribute("report",report);}
+	model.addAttribute("report",report);
+
+    }
     return "reports/update";
 
 
@@ -132,13 +138,24 @@ public class reportController {
 
     /**更新処理*/
 
-	@PostMapping("/update/{id}")
-	public String postReport(@Validated Report report,BindingResult res,@PathVariable("id") Integer id, Model model) {
+	@PostMapping("/{id}/update")
+	public String update(@Validated Report report,BindingResult res,@PathVariable("id") Integer id, Model model) {
 
 		if(res.hasErrors()) {
-			return getReport(id,model,report);
+			model.addAttribute("employeeName", reportService.findById(id).getEmployee().getName());
+			return edit(null,model,report);
 		}
-		reportService.update(report,id);
+
+		ErrorKinds result = reportService.update(report,id);
+
+            if (ErrorMessage.contains(result)) {
+                model.addAttribute(ErrorMessage.getErrorName(result), ErrorMessage.getErrorValue(result));
+               model.addAttribute("employeeName", reportService.findById(id).getEmployee().getName());
+                return edit(null,model,report);
+            }
+
+
+		//reportService.update(report,id);
 
 		/*ErrorKinds result = employeeService.update(employee);
 		if (ErrorMessage.contains(result)) {
