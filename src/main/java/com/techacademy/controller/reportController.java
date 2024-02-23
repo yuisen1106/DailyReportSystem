@@ -133,12 +133,12 @@ public class reportController {
     /**更新処理*/
 
 	@PostMapping("/update/{id}")
-	public String postReport(@Validated Report report,BindingResult res, Model model,@AuthenticationPrincipal UserDetail userDetail) {
+	public String postReport(@Validated Report report,BindingResult res,@PathVariable("id") Integer id, Model model) {
 
 		if(res.hasErrors()) {
-			return getReport(null,model,report);
+			return getReport(id,model,report);
 		}
-		reportService.save(report,userDetail);
+		reportService.update(report,id);
 
 		/*ErrorKinds result = employeeService.update(employee);
 		if (ErrorMessage.contains(result)) {

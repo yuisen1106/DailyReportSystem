@@ -140,33 +140,29 @@ public class ReportService {
         int passwordLength = employee.getPassword().length();
         return passwordLength < 8 || 16 < passwordLength;
     }
-
-    //追加　更新
+*/
+    //日報　更新
 
     @Transactional
-    public ErrorKinds update(Employee employee) {
+    public Report update(Report report,Integer id) {
 
 
+        report.setDeleteFlg(false);
 
-    	if (!"".equals(employee.getPassword())) {
-        ErrorKinds result = employeePasswordCheck(employee);
-        if (ErrorKinds.CHECK_OK != result) {
-            return result;
-        }
+        LocalDateTime now = LocalDateTime.now();
+        report.setCreatedAt(now);
+        report.setUpdatedAt(now);
+
+        Report registeredreport=findById(id);
+        report.setEmployee(registeredreport.getEmployee());
+
+
+        return  reportRepository.save(report);
+
     }
 
 
-         employee.setDeleteFlg(false);
-
-        LocalDateTime now = LocalDateTime.now();
-        employee.setCreatedAt(now);
-        employee.setUpdatedAt(now);
-
-        employeeRepository.save(employee);
-        return ErrorKinds.SUCCESS;
-    }*/
-
-
+    //名前
     public String employeeName(String code) {
 
        Employee employee= employeeService.findByCode(code);
